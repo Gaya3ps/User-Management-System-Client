@@ -1,12 +1,47 @@
-# React + Vite
+# User Management Dashboard (Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **React frontend** for the User Management Dashboard.  
+It connects to the FeathersJS backend and provides a UI to **list, add, edit, and soft-delete users** with Ant Design components.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
+- React + Vite + Ant Design
+- User listing in a table
+- Add/Edit user via modal form
+- Soft delete (marks deleted=true instead of removing from DB)
+- Gender filter (Male/Female/All)
+- Success/error toasts with loading states
+- Pagination and good UX with AntD components
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📦 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Gaya3ps/user-management-client.git
+cd user-management-client
+```
+
+Install dependencies:
+
+npm install
+
+⚙️ Configuration
+
+Update the API base URL in src/api.js:
+
+import axios from 'axios';
+
+export const api = axios.create({
+  baseURL: 'http://localhost:3030', // Change to your backend URL if deployed
+});
+
+▶️ Running Locally
+npm run dev
+
+
+The app will run at:
+👉 http://localhost:5173 (default Vite port)
