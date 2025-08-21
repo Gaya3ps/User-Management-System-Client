@@ -1,17 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Space, message, Popconfirm  } from 'antd';
-import { api } from '../api';
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  message,
+  Popconfirm,
+} from "antd";
+import { api } from "../api";
 
 const genderOptions = [
-  { label: 'All', value: 'All' },
-  { label: 'Male', value: 'Male' },
-  { label: 'Female', value: 'Female' }
+  { label: "All", value: "All" },
+  { label: "Male", value: "Male" },
+  { label: "Female", value: "Female" },
 ];
 
 export default function UsersPage() {
   const [form] = Form.useForm();
   const [rows, setRows] = useState([]);
-  const [genderFilter, setGenderFilter] = useState('All');
+  const [genderFilter, setGenderFilter] = useState("All");
   const [loading, setLoading] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,22 +31,23 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Feathers service respects deleted=false by our hook, but we keep it explicit
-      const res = await api.get('/users', { params: { deleted: false } });
+      const res = await api.get("/users", { params: { deleted: false } });
       setRows(res.data);
     } catch (e) {
       console.error(e);
-      message.error('Failed to load users');
+      message.error("Failed to load users");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const data = useMemo(() => {
-    if (genderFilter === 'All') return rows;
-    return rows.filter(u => u.gender === genderFilter);
+    if (genderFilter === "All") return rows;
+    return rows.filter((u) => u.gender === genderFilter);
   }, [rows, genderFilter]);
 
   const openAdd = () => {
@@ -51,19 +62,17 @@ export default function UsersPage() {
     setModalOpen(true);
   };
 
-const onConfirmDelete = async (record) => {
-  try {
-    // optimistic UI
-    setRows(prev => prev.filter(u => u.id !== record.id));
-    await api.patch(`/users/${record.id}`, { deleted: true });
-    message.success('User deleted');
-  } catch (e) {
-    console.error(e);
-    message.error('Delete failed');
-    fetchUsers(); // rollback by refetch
-  }
-};
-
+  const onConfirmDelete = async (record) => {
+    try {
+      setRows((prev) => prev.filter((u) => u.id !== record.id));
+      await api.patch(`/users/${record.id}`, { deleted: true });
+      message.success("User deleted");
+    } catch (e) {
+      console.error(e);
+      message.error("Delete failed");
+      fetchUsers();
+    }
+  };
 
   const submit = async () => {
     try {
@@ -71,50 +80,53 @@ const onConfirmDelete = async (record) => {
       setSaving(true);
 
       if (editing) {
-        const { data: updated } = await api.patch(`/users/${editing.id}`, values);
-        setRows(prev => prev.map(u => (u.id === updated.id ? updated : u)));
-        message.success('User updated');
+        const { data: updated } = await api.patch(
+          `/users/${editing.id}`,
+          values
+        );
+        setRows((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+        message.success("User updated");
       } else {
-        const { data: created } = await api.post('/users', values);
-        setRows(prev => [created, ...prev]);
-        message.success('User added');
+        const { data: created } = await api.post("/users", values);
+        setRows((prev) => [created, ...prev]);
+        message.success("User added");
       }
 
       setModalOpen(false);
       form.resetFields();
       setEditing(null);
     } catch (e) {
-      if (e?.errorFields) return; // form validation errors are shown by AntD
+      if (e?.errorFields) return;
       console.error(e);
-      message.error('Save failed');
+      message.error("Save failed");
     } finally {
       setSaving(false);
     }
   };
 
- const columns = [
-  { title: 'Name', dataIndex: 'name', key: 'name' },
-  { title: 'Email', dataIndex: 'email', key: 'email' },
-  { title: 'Gender', dataIndex: 'gender', key: 'gender' },
-  {
-    title: 'Actions',
-    key: 'actions',
-    render: (_, record) => (
-      <Space>
-        <Button onClick={() => openEdit(record)}>Edit</Button>
-        <Popconfirm
-          title="Soft delete this user?"
-          description={`Mark "${record.name}" as deleted?`}
-          okText="Delete"
-          okButtonProps={{ danger: true }}
-          onConfirm={() => onConfirmDelete(record)}
-        >
-          <Button danger>Delete</Button>
-        </Popconfirm>
-      </Space>
-    )
-  }
-];
+  const columns = [
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Gender", dataIndex: "gender", key: "gender" },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space>
+          <Button onClick={() => openEdit(record)}>Edit</Button>
+          <Popconfirm
+            title="Soft delete this user?"
+            description={`Mark "${record.name}" as deleted?`}
+            okText="Delete"
+            okButtonProps={{ danger: true }}
+            onConfirm={() => onConfirmDelete(record)}
+          >
+            <Button danger>Delete</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div className="bg-white rounded-2xl shadow p-4">
@@ -142,12 +154,15 @@ const onConfirmDelete = async (record) => {
       />
 
       <Modal
-        title={editing ? 'Edit User' : 'Add User'}
+        title={editing ? "Edit User" : "Add User"}
         open={modalOpen}
-        onCancel={() => { setModalOpen(false); setEditing(null); }}
+        onCancel={() => {
+          setModalOpen(false);
+          setEditing(null);
+        }}
         onOk={submit}
         confirmLoading={saving}
-        okText={editing ? 'Save Changes' : 'Create'}
+        okText={editing ? "Save Changes" : "Create"}
       >
         <Form form={form} layout="vertical">
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
@@ -159,14 +174,17 @@ const onConfirmDelete = async (record) => {
             label="Email"
             rules={[
               { required: true },
-              { type: 'email', message: 'Enter a valid email' }
+              { type: "email", message: "Enter a valid email" },
             ]}
           >
             <Input placeholder="email@example.com" />
           </Form.Item>
 
           <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
-            <Select placeholder="Select gender" options={[{ value: 'Male' }, { value: 'Female' }]} />
+            <Select
+              placeholder="Select gender"
+              options={[{ value: "Male" }, { value: "Female" }]}
+            />
           </Form.Item>
         </Form>
       </Modal>
