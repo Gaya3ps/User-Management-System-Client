@@ -27,6 +27,7 @@ export default function UsersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -66,10 +67,10 @@ export default function UsersPage() {
     try {
       setRows((prev) => prev.filter((u) => u.id !== record.id));
       await api.patch(`/users/${record.id}`, { deleted: true });
-      message.success("User deleted");
+      messageApi.success(" User has been deleted.");
     } catch (e) {
       console.error(e);
-      message.error("Delete failed");
+      messageApi.error("Delete failed");
       fetchUsers();
     }
   };
@@ -85,11 +86,11 @@ export default function UsersPage() {
           values
         );
         setRows((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
-        message.success("User updated");
+        messageApi.success("User details updated successfully!");
       } else {
         const { data: created } = await api.post("/users", values);
         setRows((prev) => [created, ...prev]);
-        message.success("User added");
+        messageApi.success("User has been successfully added!");
       }
 
       setModalOpen(false);
@@ -130,6 +131,7 @@ export default function UsersPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow p-4">
+      {contextHolder}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center mb-4">
         <Space wrap>
           <Select
